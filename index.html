@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agri Rescue AI - Smart Agriculture Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #15803d;
+      --primary-light: #22c55e;
+      --primary-dark: #14532d;
+      --accent: #eab308;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 14px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    header {
+      background: linear-gradient(135deg, #14532d, #15803d);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand i {
+      font-size: 1.8rem;
+      color: #86efac;
+    }
+
+    .brand h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .brand span {
+      font-size: 0.75rem;
+      background: rgba(255,255,255,0.2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 6px;
+      font-weight: 500;
+    }
+
+    .lang-switcher {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 25px;
+      padding: 4px 6px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn.active {
+      background: white;
+      color: var(--primary-dark);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Layout */
+    .container {
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.25rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      height: fit-content;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .nav-btn i {
+      width: 20px;
+      font-size: 1.1rem;
+    }
+
+    .nav-btn:hover {
+      background: #f1f5f9;
+      color: var(--primary);
+    }
+
+    .nav-btn.active {
+      background: #dcfce7;
+      color: var(--primary-dark);
+    }
+
+    /* Main Area */
+    .content-area {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      min-height: 550px;
+    }
+
+    .view-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .view-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .section-header h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      padding: 10px 22px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+    }
+
+    /* Result Cards */
+    .result-card {
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .result-card.active {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    .result-card h3 {
+      color: var(--primary-dark);
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .alert-banner {
+      background: #fefce8;
+      border-left: 4px solid var(--accent);
+      padding: 10px 14px;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: #854d0e;
+      border-radius: 4px;
+    }
+
+    /* Records Table */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .badge-dry { background: #fef3c7; color: #92400e; }
+    .badge-moist { background: #e0f2fe; color: #0369a1; }
+    .badge-wet { background: #dcfce7; color: #15803d; }
+
+    /* Tips Grid */
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
+      margin-top: 1rem;
+    }
+
+    .tip-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      display: flex;
+      gap: 14px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .tip-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-color: #cbd5e1;
+    }
+
+    .tip-icon {
+      font-size: 1.5rem;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .tip-body h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .tip-body p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1e293b;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      .nav-btn span {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-seedling"></i>
+      <div>
+        <h1>AGRI RESCUE AI <span>PROTOTYPE</span></h1>
+      </div>
+    </div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" id="btn-lang-en" onclick="setLanguage('en')">English</button>
+      <button class="lang-btn" id="btn-lang-te" onclick="setLanguage('te')">తెలుగు</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Navigation Sidebar -->
+    <aside class="sidebar">
+      <button class="nav-btn active" onclick="switchTab('add')">
+        <i class="fa-solid fa-user-plus"></i>
+        <span data-i18n="nav_add">Add Farmer & Crop</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('symptom')">
+        <i class="fa-solid fa-stethoscope"></i>
+        <span data-i18n="nav_symptom">Symptom Checker</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('irrigation')">
+        <i class="fa-solid fa-droplet"></i>
+        <span data-i18n="nav_irrigation">Irrigation Advisor</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('records')">
+        <i class="fa-solid fa-database"></i>
+        <span data-i18n="nav_records">Saved Records</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('tips')">
+        <i class="fa-solid fa-lightbulb"></i>
+        <span data-i18n="nav_tips">Agriculture Tips</span>
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+
+      <!-- View 1: Add Farmer & Crop -->
+      <section id="view-add" class="view-panel active">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-circle-plus"></i> <span data-i18n="title_add">Register Farmer & Crop</span></h2>
+          <p data-i18n="desc_add">Keep track of your farm entries and field soil conditions.</p>
+        </div>
+        <form id="cropForm" onsubmit="handleSaveRecord(event)">
+          <div class="form-group">
+            <label data-i18n="label_farmer">Farmer Name</label>
+            <input type="text" id="farmerName" placeholder="e.g. Ramesh Kumar" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="label_crop">Crop Name</label>
+            <input type="text" id="cropName" placeholder="e.g. Paddy / Cotton / Tomato" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="label_soil">Soil Moisture Condition</label>
+            <select id="soilCondition" required>
+              <option value="" disabled selected data-i18n="select_soil">Select soil state</option>
+              <option value="dry" data-i18n="soil_dry">Dry (ఎండిపోయిన)</option>
+              <option value="moist" data-i18n="soil_moist">Moist (తేమగా ఉన్న)</option>
+              <option value="wet" data-i18n="soil_wet">Wet / Waterlogged (నీరు నిండిన)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> <span data-i18n="btn_save">Save Record</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- View 2: Check Symptoms -->
+      <section id="view-symptom" class="view-panel">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-magnifying-glass"></i> <span data-i18n="title_symptom">Crop Symptom Diagnostic</span></h2>
+          <p data-i18n="desc_symptom">Select observed symptoms on crops to get tailored agronomic recommendations.</p>
+        </div>
+        <form onsubmit="handleCheckSymptom(event)">
+          <div class="form-group">
+            <label data-i18n="label_crop">Crop Name</label>
+            <input type="text" id="sympCrop" placeholder="e.g. Chilli, Groundnut" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="label_observed_symp">Observed Symptom</label>
+            <select id="sympChoice" required>
+              <option value="1" data-i18n="symp_1">Yellow leaves</option>
+              <option value="2" data-i18n="symp_2">Brown or black spots</option>
+              <option value="3" data-i18n="symp_3">Wilting</option>
+              <option value="4" data-i18n="symp_4">White powder on leaves</option>
+              <option value="5" data-i18n="symp_5">Holes in leaves</option>
+              <option value="6" data-i18n="symp_6">No visible symptoms</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_diagnose">Diagnose Crop</span>
+          </button>
+        </form>
+
+        <div id="sympResult" class="result-card">
+          <h3><i class="fa-solid fa-clipboard-check"></i> <span data-i18n="result_heading">Advisory Recommendation</span></h3>
+          <p><strong><span data-i18n="label_crop">Crop</span>:</strong> <span id="sympCropName"></span></p>
+          <p style="margin-top: 6px;"><strong><span data-i18n="label_advice">Advice</span>:</strong> <span id="sympAdviceText"></span></p>
+          <div class="alert-banner" id="sympDisclaimer">
+            Note: This is a rule-based suggestion, not a confirmed laboratory diagnosis.
+          </div>
+        </div>
+      </section>
+
+      <!-- View 3: Irrigation Advice -->
+      <section id="view-irrigation" class="view-panel">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-cloud-showers-water"></i> <span data-i18n="title_irrigation">Smart Irrigation Advisory</span></h2>
+          <p data-i18n="desc_irrigation">Determine optimal watering schedule based on moisture levels and crop requirements.</p>
+        </div>
+        <form onsubmit="handleIrrigationAdvice(event)">
+          <div class="form-group">
+            <label data-i18n="label_crop">Crop Name</label>
+            <input type="text" id="irrigCrop" placeholder="e.g. Maize, Cotton" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="label_soil">Current Soil Condition</label>
+            <select id="irrigSoil" required>
+              <option value="dry" data-i18n="soil_dry">Dry (ఎండిపోయిన)</option>
+              <option value="moist" data-i18n="soil_moist">Moist (తేమగా ఉన్న)</option>
+              <option value="wet" data-i18n="soil_wet">Wet / Waterlogged (నీరు నిండిన)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary">
+            <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_check_water">Get Watering Guide</span>
+          </button>
+        </form>
+
+        <div id="irrigResult" class="result-card">
+          <h3><i class="fa-solid fa-water"></i> <span data-i18n="irrig_plan">Water Management Plan</span></h3>
+          <p><strong><span data-i18n="label_crop">Crop</span>:</strong> <span id="irrigCropName"></span></p>
+          <p style="margin-top: 6px;"><strong><span data-i18n="label_advice">Advice</span>:</strong> <span id="irrigAdviceText"></span></p>
+        </div>
+      </section>
+
+      <!-- View 4: Saved Records -->
+      <section id="view-records" class="view-panel">
+        <div class="section-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
+          <div>
+            <h2><i class="fa-solid fa-list-check"></i> <span data-i18n="title_records">Stored Crop Records</span></h2>
+            <p data-i18n="desc_records">Browse records saved locally on this device.</p>
+          </div>
+          <button onclick="clearAllRecords()" style="background:#fee2e2; border:none; color:#dc2626; padding:6px 12px; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer;">
+            <i class="fa-solid fa-trash"></i> <span data-i18n="btn_clear">Clear All</span>
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th data-i18n="th_farmer">Farmer Name</th>
+                <th data-i18n="th_crop">Crop</th>
+                <th data-i18n="th_soil">Soil Condition</th>
+                <th data-i18n="th_date">Date Added</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+          <p id="emptyMsg" style="text-align: center; color: var(--text-muted); padding: 2rem; display: none;" data-i18n="no_records">
+            No records saved yet.
+          </p>
+        </div>
+      </section>
+
+      <!-- View 5: Agriculture Tips -->
+      <section id="view-tips" class="view-panel">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-book-open-reader"></i> <span data-i18n="title_tips">Expert Farming Tips</span></h2>
+          <p data-i18n="desc_tips">Best practices for sustainable crop yield and soil maintenance.</p>
+        </div>
+
+        <div class="tips-grid" id="tipsContainer">
+          <!-- Dynamically populated for multi-lingual switch -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="toast" class="toast">Record saved successfully!</div>
+
+  <script>
+    // Translations Dictionary
+    const translations = {
+      en: {
+        nav_add: "Add Farmer & Crop",
+        nav_symptom: "Symptom Checker",
+        nav_irrigation: "Irrigation Advisor",
+        nav_records: "Saved Records",
+        nav_tips: "Agriculture Tips",
+        title_add: "Register Farmer & Crop",
+        desc_add: "Keep track of your farm entries and field soil conditions.",
+        label_farmer: "Farmer Name",
+        label_crop: "Crop Name",
+        label_soil: "Soil Moisture Condition",
+        select_soil: "Select soil state",
+        soil_dry: "Dry",
+        soil_moist: "Moist",
+        soil_wet: "Wet / Waterlogged",
+        btn_save: "Save Record",
+        title_symptom: "Crop Symptom Diagnostic",
+        desc_symptom: "Select observed symptoms on crops to get tailored agronomic recommendations.",
+        label_observed_symp: "Observed Symptom",
+        symp_1: "Yellow leaves",
+        symp_2: "Brown or black spots",
+        symp_3: "Wilting",
+        symp_4: "White powder on leaves",
+        symp_5: "Holes in leaves",
+        symp_6: "No visible symptoms",
+        btn_diagnose: "Diagnose Crop",
+        result_heading: "Advisory Recommendation",
+        label_advice: "Advice",
+        disclaimer: "Note: This is a rule-based suggestion, not a confirmed diagnosis.",
+        title_irrigation: "Smart Irrigation Advisory",
+        desc_irrigation: "Determine optimal watering schedule based on moisture levels and crop requirements.",
+        btn_check_water: "Get Watering Guide",
+        irrig_plan: "Water Management Plan",
+        title_records: "Stored Crop Records",
+        desc_records: "Browse records saved locally on this device.",
+        btn_clear: "Clear All",
+        th_farmer: "Farmer Name",
+        th_crop: "Crop",
+        th_soil: "Soil Condition",
+        th_date: "Date Added",
+        no_records: "No records saved yet.",
+        title_tips: "Expert Farming Tips",
+        desc_tips: "Best practices for sustainable crop yield and soil maintenance.",
+        symptom_advices: {
+          1: "Possible causes include nutrient deficiency, overwatering or poor drainage. Check soil moisture.",
+          2: "Possible disease or plant stress. Inspect affected leaves and consult an agricultural expert.",
+          3: "Check soil moisture, roots and drainage. Both too little and too much water can cause wilting.",
+          4: "Possible powdery mildew or another leaf problem. Confirm the cause before applying treatment.",
+          5: "Possible insect damage. Inspect both sides of leaves for insects or eggs.",
+          6: "No symptoms reported. Monitor the crop regularly."
+        },
+        irrigation_advices: {
+          dry: "Check root-zone moisture. Water if required for the crop and its growth stage.",
+          moist: "Check moisture before watering again. Avoid waterlogging.",
+          wet: "Avoid watering. Ensure proper drainage to avoid root rot."
+        },
+        tips: [
+          { title: "Soil Moisture Testing", desc: "Always check root-zone moisture manually or with sensor prior to irrigation." },
+          { title: "Routine Crop Inspection", desc: "Inspect undersides of leaves and stems weekly for early signs of pests." },
+          { title: "Field Drainage", desc: "Maintain proper water run-off channels to prevent root asphyxiation during heavy rain." },
+          { title: "Soil Health Testing", desc: "Conduct soil fertility tests once every season to optimize N-P-K fertilizer application." },
+          { title: "Pest & Disease ID", desc: "Confirm specific fungal or insect agents before spraying chemical treatments." },
+          { title: "Local Best Practices", desc: "Follow state agricultural university advisory bulletins for seasonal pest updates." }
+        ]
+      },
+      te: {
+        nav_add: "రైతు & పంట నమోదు",
+        nav_symptom: "లక్షణాల పరీక్ష",
+        nav_irrigation: "నీటిపారుదల సలహా",
+        nav_records: "సేవ్ చేసిన వివరాలు",
+        nav_tips: "వ్యవసాయ సూచనలు",
+        title_add: "రైతు మరియు పంట నమోదు చేయండి",
+        desc_add: "మీ పొలం మరియు నేల వివరాలను ఇక్కడ భద్రపరచండి.",
+        label_farmer: "రైతు పేరు",
+        label_crop: "పంట పేరు",
+        label_soil: "నేల తేమ పరిస్థితి",
+        select_soil: "నేల పరిస్థితిని ఎంచుకోండి",
+        soil_dry: "ఎండిపోయిన (Dry)",
+        soil_moist: "తేమగా ఉన్న (Moist)",
+        soil_wet: "నీరు నిండిన (Wet)",
+        btn_save: "నమోదును భద్రపరచండి",
+        title_symptom: "పంట రోగ నిర్ధారణ & సూచనలు",
+        desc_symptom: "పంటపై కనిపించే లక్షణాన్ని ఎంచుకుని తగిన సలహా పొందండి.",
+        label_observed_symp: "గమనించిన లక్షణం",
+        symp_1: "పసుపు రంగులోకి మారిన ఆకులు",
+        symp_2: "గోధుమ లేదా నల్లటి మచ్చలు",
+        symp_3: "వాడిపోవడం (వడలిపోవడం)",
+        symp_4: "ఆకులపై తెల్లటి పొడి (బూడిద తెగులు)",
+        symp_5: "ఆకులకు రంధ్రాలు ఉండటం",
+        symp_6: "ఎలాంటి సమస్య లక్షణాలు లేవు",
+        btn_diagnose: "సలహా చూడండి",
+        result_heading: "వ్యవసాయ సలహా",
+        label_advice: "సూచన",
+        disclaimer: "గమనిక: ఇవి ప్రాథమిక సూచనలు మాత్రమే. వ్యవసాయ నిపుణుడిని సంప్రదించండి.",
+        title_irrigation: "స్మార్ట్ నీటిపారుదల సలహాదారు",
+        desc_irrigation: "నేల తేమ మరియు పంట అవసరాల ఆధారంగా నీటి యాజమాన్యం.",
+        btn_check_water: "నీటి సలహా పొందండి",
+        irrig_plan: "నీటి యాజమాన్య ప్రణాళిక",
+        title_records: "భద్రపరిచిన పంట రికార్డులు",
+        desc_records: "ఈ పరికరంలో భద్రపరచబడిన రైతుల పంట సమాచారం.",
+        btn_clear: "అన్నీ తొలగించు",
+        th_farmer: "రైతు పేరు",
+        th_crop: "పంట",
+        th_soil: "నేల పరిస్థితి",
+        th_date: "నమోదు తేదీ",
+        no_records: "ఇప్పటివరకు ఎలాంటి రికార్డులు నమోదు కాలేదు.",
+        title_tips: "కీలక వ్యవసాయ చిట్కాలు",
+        desc_tips: "మంచి దిగుబడి మరియు నేల ఆరోగ్యం కొరకు నిపుణుల సలహాలు.",
+        symptom_advices: {
+          1: "పోషకాల లోపం లేదా అధిక నీరు ఉండవచ్చు. నేల తేమను పరిశీలించండి.",
+          2: "తెగులు లేదా ఒత్తిడి కారణం కావచ్చు. ప్రభావిత ఆకులను క్షుణ్ణంగా పరిశీలించండి.",
+          3: "నేల తేమ మరియు వేర్లను పరిశీలించండి. అతి తక్కువ లేదా ఎక్కువ నీటి వల్ల వాడిపోవచ్చు.",
+          4: "బూడిద తెగులు (Powdery Mildew) కావచ్చు. నిర్ధారణ చేసుకుని నివారణ చర్యలు తీసుకోండి.",
+          5: "పురుగుల దాడి కావచ్చు. ఆకుల వెనుక భాగంలో గుడ్లు లేదా పురుగులు ఉన్నాయేమో చూడండి.",
+          6: "సమస్య లేదు. పంటను క్రమం తప్పకుండా పర్యవేక్షించండి."
+        },
+        irrigation_advices: {
+          dry: "వేరు మండలంలో తేమను తనిఖీ చేసి అవసరమైన మేరకు వెంటనే నీరు పెట్టండి.",
+          moist: "ప్రస్తుతం తేమ సరిపడా ఉంది. నీరు ఎక్కువ కాకుండా జాగ్రత్త వహించండి.",
+          wet: "నీరు నిల్వ ఉండకుండా మురుగు నీటి కాలువల ద్వారా బయటకు పంపించండి."
+        },
+        tips: [
+          { title: "నేల తేమ పరిశీలన", desc: "నీరు పెట్టే ముందు నేలలో వేరు ప్రాంతంలో తేమను తప్పక పరిశీలించండి." },
+          { title: "ఆకుల క్రమబద్ధ తనిఖీ", desc: "తెగుళ్లు మరియు పురుగుల గుడ్ల కోసం ఆకుల అడుగు భాగాన్ని వారానికి ఒకసారి చూడండి." },
+          { title: "మురుగునీటి పారుదల", desc: "వర్షాలు పడినప్పుడు నీరు నిలబడకుండా కాలువలను సరిచేయండి." },
+          { title: "భూసార పరీక్ష", desc: "ప్రతి పంట సీజన్‌కు ముందు భూసార పరీక్ష చేయించి సరైన ఎరువులు వాడండి." },
+          { title: "సమగ్ర సస్యరక్షణ", desc: "సమస్యను ఖచ్చితంగా గుర్తించిన తర్వాత మాత్రమే తగిన పురుగుమందులు వాడండి." },
+          { title: "అధికారిక సూచనలు", desc: "స్థానిక వ్యవసాయ విస్తరణాధికారుల మరియు యూనివర్సిటీ సూచనలను పాటించండి." }
+        ]
+      }
+    };
+
+    let currentLang = 'en';
+
+    // Initialize Records from localStorage or Defaults
+    function getStoredRecords() {
+      const data = localStorage.getItem('agri_records');
+      if (data) return JSON.parse(data);
+      return [
+        { farmer: "Venkat Rao", crop: "Paddy", soil: "moist", date: "2026-10-09" },
+        { farmer: "Lakshmi Narayana", crop: "Cotton", soil: "dry", date: "2026-10-10" }
+      ];
+    }
+
+    function saveRecordsToStorage(records) {
+      localStorage.setItem('agri_records', JSON.stringify(records));
+    }
+
+    // Switch Language
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+      document.getElementById('btn-lang-te').classList.toggle('active', lang === 'te');
+
+      const dict = translations[lang];
+
+      // Update text in DOM with data-i18n
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.innerText = dict[key];
+        }
+      });
+
+      renderTips();
+      renderRecords();
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById('view-' + tabId).classList.add('active');
+
+      if (tabId === 'records') renderRecords();
+    }
+
+    // Save Record Handler
+    function handleSaveRecord(e) {
+      e.preventDefault();
+      const farmer = document.getElementById('farmerName').value.trim();
+      const crop = document.getElementById('cropName').value.trim();
+      const soil = document.getElementById('soilCondition').value;
+
+      if (!farmer || !crop || !soil) return;
+
+      const records = getStoredRecords();
+      records.push({
+        farmer,
+        crop,
+        soil,
+        date: new Date().toISOString().split('T')[0]
+      });
+
+      saveRecordsToStorage(records);
+      document.getElementById('cropForm').reset();
+      showToast(currentLang === 'te' ? "రికార్డు విజయవంతంగా భద్రపరచబడింది!" : "Crop record saved successfully!");
+      renderRecords();
+    }
+
+    // Clear Records
+    function clearAllRecords() {
+      if (confirm(currentLang === 'te' ? "రికార్డులన్నీ తొలగించాలా?" : "Clear all stored crop records?")) {
+        localStorage.removeItem('agri_records');
+        renderRecords();
+      }
+    }
+
+    // Render Records
+    function renderRecords() {
+      const records = getStoredRecords();
+      const tbody = document.getElementById('recordsBody');
+      const emptyMsg = document.getElementById('emptyMsg');
+      tbody.innerHTML = '';
+
+      if (records.length === 0) {
+        emptyMsg.style.display = 'block';
+        return;
+      }
+      emptyMsg.style.display = 'none';
+
+      records.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${idx + 1}</strong></td>
+          <td>${escapeHtml(r.farmer)}</td>
+          <td><i class="fa-solid fa-wheat-awn" style="color:#16a34a; margin-right:4px;"></i> ${escapeHtml(r.crop)}</td>
+          <td><span class="badge badge-${r.soil}">${r.soil}</span></td>
+          <td style="color:#64748b; font-size:0.85rem;">${r.date || 'Today'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Symptom Diagnostic Handler
+    function handleCheckSymptom(e) {
+      e.preventDefault();
+      const crop = document.getElementById('sympCrop').value.trim();
+      const choice = document.getElementById('sympChoice').value;
+
+      const dict = translations[currentLang];
+      const advice = dict.symptom_advices[choice];
+
+      document.getElementById('sympCropName').innerText = crop;
+      document.getElementById('sympAdviceText').innerText = advice;
+      document.getElementById('sympDisclaimer').innerText = dict.disclaimer;
+      document.getElementById('sympResult').classList.add('active');
+    }
+
+    // Irrigation Advisory Handler
+    function handleIrrigationAdvice(e) {
+      e.preventDefault();
+      const crop = document.getElementById('irrigCrop').value.trim();
+      const soil = document.getElementById('irrigSoil').value;
+
+      const dict = translations[currentLang];
+      const advice = dict.irrigation_advices[soil] || dict.irrigation_advices['dry'];
+
+      document.getElementById('irrigCropName').innerText = crop;
+      document.getElementById('irrigAdviceText').innerText = advice;
+      document.getElementById('irrigResult').classList.add('active');
+    }
+
+    // Render Tips Cards
+    function renderTips() {
+      const container = document.getElementById('tipsContainer');
+      const tips = translations[currentLang].tips;
+      container.innerHTML = '';
+
+      const icons = [
+        "fa-droplet", "fa-magnifying-glass", "fa-water", 
+        "fa-flask", "fa-bug", "fa-clipboard-list"
+      ];
+
+      tips.forEach((t, i) => {
+        const card = document.createElement('div');
+        card.className = 'tip-card';
+        card.innerHTML = `
+          <div class="tip-icon"><i class="fa-solid ${icons[i % icons.length]}"></i></div>
+          <div class="tip-body">
+            <h4>${t.title}</h4>
+            <p>${t.desc}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTips();
+      renderRecords();
+    });
+  </script>
+</body>
+</html>
